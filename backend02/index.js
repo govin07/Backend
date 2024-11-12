@@ -17,8 +17,19 @@ http.createServer((req, res )=>{
        res.end(products)  
     }
     else if(path.pathname=='/products' && path.query.id !== undefined && req.method=="GET"){
-        const pro =  JSON.parse(products)
-        console.log(pro)
+        let productArray =  JSON.parse(products);
+       let product = productArray.find((item) => 
+           {
+            return  item.id == path.query.id ;
+           }
+         )
+         if(product!=undefined){
+            res.end(JSON.stringify(product))
+         }
+        else{
+            res.end(JSON.stringify({"message":"product not found"}))
+        }
+        
     }
    
   
