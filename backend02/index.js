@@ -31,6 +31,26 @@ http.createServer((req, res )=>{
         }
         
     }
+    else if(req.method == "POST" && path.pathname == "/products"){
+
+        let product = "";
+         req.on("data",(chunk)=>{
+            product = product+chunk;
+            console.log(product)
+            
+         })
+         req.on("end",() => {
+            let productArray =  JSON.parse(products);
+            const newProduct = JSON.parse(product)
+            productArray.push( newProduct);
+            fs.writeFile("./products.json", JSON.stringify(productArray), (err)=> {
+                if(err == null){
+                    res.end(JSON.stringify({"message":"new product added"}))
+                }
+            })
+         })
+         res.end("psot method")
+    }
    
   
 }).listen(8000)
