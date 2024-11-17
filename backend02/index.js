@@ -7,6 +7,7 @@ const url = require('url');
 // creating a  server
 http.createServer((req, res )=>{
 
+
     let products = fs.readFileSync('./products.json','utf-8')
 
     const path = url.parse(req.url,true)
@@ -14,7 +15,9 @@ http.createServer((req, res )=>{
     // res.end('nothing')
     
     if(path.pathname=='/products' && path.query.id == undefined && req.method=="GET"){
+        res.setHeader("Access-Control-Allow-Origin","*")
        res.end(products)  
+     
     }
     else if(path.pathname=='/products' && path.query.id !== undefined && req.method=="GET"){
         let productArray =  JSON.parse(products);
@@ -50,6 +53,54 @@ http.createServer((req, res )=>{
             })
          })
          res.end("psot method")
+    }
+    else if (req.method == "DELETE" && path.pathname == "/products"){
+        let id = path.query.id;
+        let productArray = JSON.parse(products);
+       let index =  productArray.findIndex((product)=>{
+            return product.id = id;
+
+        })
+        productArray.splice(index,1);
+        fs.writeFile("./products.json", JSON.stringify(productArray), (err)=> {
+            if(err == null){
+                res.end(JSON.stringify({"message":"new product added"}))
+            }
+            else{
+                res.end("error")
+            }
+        })
+    }
+    // endpoint  to update a produuct
+    else if (req.method == "PUT" && path.pathname =="/products"){
+        let id = path.query.id;
+        let product="";
+        req.on("data",(chunk)=>{
+            product+=chunk
+        })
+        req.on("end",() => {
+            let productArray = JSON.parse(products);
+            let productOBJ = JSON.parse(product);
+            let index = productArray.findIndex((product) => {
+              return  product.id == path.query.id
+
+            })
+            if(index!== -1){
+
+                productArray[index]=productOBJ;
+                fs.writeFile("./products.json", JSON.stringify(productArray), (err)=> {
+                    if(err == null){
+                        res.end(JSON.stringify({"message":"product updates"}))
+                    }
+                    else{
+                        res.end("error")
+                    }
+                })
+
+            }else{
+                res.end(JSON.stringify({"message":"the element not found"}))
+            }
+        })
     }
    
   
