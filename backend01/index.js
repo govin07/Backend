@@ -3,7 +3,7 @@
 
   const data1 = async () => {
      const data2 = fs.readFileSync('./abc.txt', 'utf-8')
-     console.log(data2)
+     console.log(data2) 
   } 
 
   data1()
