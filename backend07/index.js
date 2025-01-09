@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const app = express();
 app.use(express.json())
 
-mongoose.connect("mongodb://localhost:27017/DB-01").then(()=>{
+mongoose.connect("mongodb://localhost:27017/DB-01")
+   .then(()=>{
     console.log("database is connected")
 })
 .catch(()=>{
@@ -34,7 +35,8 @@ const productSchema = mongoose.Schema({
         type:String,
         enum: ["electronic", "clothing","Household"],
     },
-}, {timestamps:true })
+    
+})
 
 
 // model creation
@@ -61,16 +63,46 @@ app.get("/testing/:id", (req, res)=>{
 
 })
 app.get("/products",(req,res)=>{
-    res.send("All products")
+       
+      productModel.find()
+      .then((products)=>{
+        console.log(products)
+        res.send(products)
+      })
+      .catch((err)=>{
+        res.send({message:"something went wrong"})
+      })
+
+
+
+    
 })
 
 app.get("/products/:id", (req,res)=>{
-    res.send({message:"single product"})
+    productModel.findOne({_id:req.params.id})
+    .then((products)=>{
+      console.log(products)
+      res.send(products)
+    })
+    .catch((err)=>{
+      res.send({message:"something went wrong"})
+    })
 
 })
 app.post("/products", (req,res)=>{
     console.log(req.body)
+    productModel.create(req.body)
+    .then((document)=>{
+      console.log("data is inserted", document)
+    })
+    .catch((err)=>{
+        console.log("data is not inserted" , err)
+        
+    })
+
+
     res.send("post method")
+    
 
 })
 
@@ -86,8 +118,15 @@ function middleman(req,res, next){
 }
 
 app.delete("/products/:id", (req, res)=>{
-    console.log(req.params.id);
-    res.send({messege: "Delete successfull"})
+    productModel.deleteOne({_id:req.params.id
+    })
+    .then((product)=>{
+      console.log("product is deleted", product)
+    })
+    .catch((err)=>{
+        console.log("data is not inserted" , err)
+        
+    })
 
 })
 
