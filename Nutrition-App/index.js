@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs'); 
 const userModel = require("./models/userModel")
+const foodModel = require('./models/foodModel')
+const verifyToken = require('./verifyToken')
 
 
 
@@ -77,6 +79,39 @@ app.post("/login",async(req,res)=>{
 
 
 })
+ 
+// endpoint to see all foods
+app.get("/foods", verifyToken, async (req,res)=>{
+    try{
+        let foods = await foodModel.find()
+        res.send(foods)
+    }catch(err){
+        console.log(err);
+        res.status(500).send({message:"something wrong in getting foods"})
+
+    }
+});
+ 
+// endpoint search food by name
+
+app.get("/foods/:name",  async (req,res)=>{
+    try{
+   let foods = await foodModel.find({name:{$regex:req.params.name, $options:'i'}})
+   if(foods.length!==0){
+    res.send(foods)
+   }
+   else{
+    res.status(404).send({message:"food items not found "})
+   }
+  
+
+    }catch(err){
+        console.log(err)
+        res.status(500).send({message:"some problem in searching food "})
+
+    }
+})
+
 
 
 app.listen(8000, ()=>{
