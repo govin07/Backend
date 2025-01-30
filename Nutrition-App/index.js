@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const userModel = require("./models/userModel")
 const foodModel = require('./models/foodModel')
 const verifyToken = require('./verifyToken')
+const TrackingSchema = require('./models/trackingModel');
+const trackingModel = require('./models/trackingModel');
 
 
 
@@ -110,6 +112,18 @@ app.get("/foods/:name",  async (req,res)=>{
         res.status(500).send({message:"some problem in searching food "})
 
     }
+})
+
+// endpoint to track a food 
+app.post('/track',verifyToken,async (req,res)=>{
+   let trackData =  req.body;
+   try{
+    let data = await trackingModel.create(trackData)
+     res.status(201).send({message:"food added"})
+   }catch(err){
+       res.status(500).end({message:"something wrong in tracking food "})
+   }
+
 })
 
 
