@@ -126,7 +126,20 @@ app.post('/track',verifyToken,async (req,res)=>{
 
 })
 
+// endpoint to fetch all foods eaten by a user
 
+app.get("/track/:userid", verifyToken, async(req,res)=>{
+    let userid = req.params.userid;
+    try{
+      let  food = await trackingModel.find({userId:userid}).populate('userId').populate('foodId')
+      res.send(food)
+
+    }catch(err){
+        res.status(500).send({message:"some problem in tracking food by userid"})
+
+    }
+    
+})
 
 app.listen(8000, ()=>{
     console.log("app is running on 8000 port")
